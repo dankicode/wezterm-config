@@ -5,6 +5,28 @@ local act = wezterm.action
 
 local mod = {}
 
+local function split_with_current_shell(direction)
+   return wezterm.action_callback(function(window, pane)
+      local current_process = pane:get_foreground_process_name() or ''
+      local cmd = nil
+
+      -- Check if running PowerShell
+      if current_process:lower():find('powershell') or current_process:lower():find('pwsh') then
+         cmd = { 'powershell.exe', '-NoLogo' }
+      -- Check if running cmd
+      elseif current_process:lower():find('cmd') then
+         cmd = { 'cmd.exe' }
+      end
+      -- Otherwise, use default (WSL)
+
+      if direction == 'Down' then
+         pane:split({ direction = 'Bottom', args = cmd })
+      else
+         pane:split({ direction = 'Right', args = cmd })
+      end
+   end)
+end
+
 if platform.is_mac then
    mod.SUPER = 'SUPER'
    mod.SUPER_REV = 'SUPER|CTRL'
@@ -160,16 +182,12 @@ local keys = {
    {
       key = [[\]],
       mods = mod.SUPER,
-      action = act.SplitPane({
-         direction = 'Down',
-      }),
+      action = platform.is_win and split_with_current_shell('Down') or act.SplitVertical({ domain = 'CurrentPaneDomain' }),
    },
    {
       key = [[\]],
       mods = mod.SUPER_REV,
-      action = act.SplitPane({
-         direction = 'Right',
-      }),
+      action = platform.is_win and split_with_current_shell('Right') or act.SplitHorizontal({ domain = 'CurrentPaneDomain' }),
    },
    -- {
    --    key = [[\]],
