@@ -9,7 +9,7 @@ if platform.is_mac then
    mod.SUPER = 'SUPER'
    mod.SUPER_REV = 'SUPER|CTRL'
 elseif platform.is_win or platform.is_linux then
-   mod.SUPER = 'ALT' -- to not conflict with Windows key shortcuts
+   mod.SUPER = 'CTRL' -- to not conflict with Windows key shortcuts
    mod.SUPER_REV = 'ALT|CTRL'
 end
 
@@ -160,13 +160,27 @@ local keys = {
    {
       key = [[\]],
       mods = mod.SUPER,
-      action = act.SplitVertical({ domain = 'CurrentPaneDomain' }),
+      action = act.SplitPane({
+         direction = 'Down',
+      }),
    },
    {
       key = [[\]],
       mods = mod.SUPER_REV,
-      action = act.SplitHorizontal({ domain = 'CurrentPaneDomain' }),
+      action = act.SplitPane({
+         direction = 'Right',
+      }),
    },
+   -- {
+   --    key = [[\]],
+   --    mods = mod.SUPER,
+   --    action = act.SplitVertical({ domain = 'CurrentPaneDomain', cwd = 'CurrentPaneWorkspace' }),
+   -- },
+   -- {
+   --    key = [[\]],
+   --    mods = mod.SUPER_REV,
+   --    action = act.SplitHorizontal({ domain = 'CurrentPaneDomain', cwd = 'CurrentPaneWorkspace' }),
+   -- },
 
    -- panes: zoom+close pane
    { key = 'Enter', mods = mod.SUPER,     action = act.TogglePaneZoomState },
@@ -184,8 +198,8 @@ local keys = {
    },
 
    -- panes: scroll pane
-   { key = 'u',        mods = mod.SUPER, action = act.ScrollByLine(-5) },
-   { key = 'd',        mods = mod.SUPER, action = act.ScrollByLine(5) },
+   { key = 'u',        mods = platform.is_mac and mod.SUPER or mod.SUPER_REV, action = act.ScrollByLine(-5) },
+   { key = 'd',        mods = platform.is_mac and mod.SUPER or mod.SUPER_REV, action = act.ScrollByLine(5) },
    { key = 'PageUp',   mods = 'NONE',    action = act.ScrollByPage(-0.75) },
    { key = 'PageDown', mods = 'NONE',    action = act.ScrollByPage(0.75) },
 

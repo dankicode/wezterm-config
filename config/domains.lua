@@ -1,4 +1,7 @@
 return {
+
+   -- default_domain = 'WSL:Ubuntu',
+
    -- ref: https://wezfurlong.org/wezterm/config/lua/SshDomain.html
    -- ssh_domains = {},
    ssh_domains = {
@@ -20,8 +23,8 @@ return {
       {
          name = 'WSL:Ubuntu',
          distribution = 'Ubuntu',
-         username = 'kevin',
-         default_cwd = '/home/kevin',
+         username = 'dki',
+         default_cwd = '/home/dki',
          default_prog = { 'fish', '-l' },
       },
    },
