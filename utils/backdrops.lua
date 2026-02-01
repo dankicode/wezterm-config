@@ -58,7 +58,13 @@ end
 ---   This throws a coroutine error if the function is invoked in outside of `wezterm.lua` in the -
 ---   initial load of the Terminal config.
 function BackDrops:set_images()
-   self.images = wezterm.glob(self.images_dir .. GLOB_PATTERN)
+   local glob_pattern = self.images_dir .. GLOB_PATTERN
+   wezterm.log_info('BackDrops: Searching for images with pattern: ' .. glob_pattern)
+   self.images = wezterm.glob(glob_pattern)
+   wezterm.log_info('BackDrops: Found ' .. #self.images .. ' images')
+   for i, img in ipairs(self.images) do
+      wezterm.log_info('  [' .. i .. '] ' .. img)
+   end
    return self
 end
 
@@ -74,6 +80,13 @@ end
 ---@private
 ---@return table
 function BackDrops:_create_opts()
+   -- If no images are loaded, return focus mode style background
+   if #self.images == 0 then
+      wezterm.log_warn('BackDrops: No images loaded, using focus mode background')
+      return self:_create_focus_opts()
+   end
+
+   wezterm.log_info('BackDrops: Using image [' .. self.current_idx .. ']: ' .. self.images[self.current_idx])
    return {
       {
          source = { File = self.images[self.current_idx] },
@@ -170,6 +183,9 @@ end
 ---Pass in `Window` object to override the current window options
 ---@param window any? WezTerm `Window` see: https://wezfurlong.org/wezterm/config/lua/window/index.html
 function BackDrops:random(window)
+   if #self.images == 0 then
+      return
+   end
    self.current_idx = math.random(#self.images)
 
    if window ~= nil then
