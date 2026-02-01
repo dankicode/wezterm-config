@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(where:*)",
+      "Bash(wezterm:*)",
+      "Bash(ls:*)",
+      "Read(//c/Users/dki/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
