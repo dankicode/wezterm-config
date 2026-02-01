@@ -3,7 +3,7 @@ local wezterm = require('wezterm')
 local Config = require('config')
 
 require('utils.backdrops')
-   :set_images_dir(require('wezterm').home_dir .. '/.config/wezterm/backdrops/')
+   :set_images_dir(wezterm.home_dir .. '/.config/wezterm/backdrops/')
    :set_images()
    :random()
 

@@ -80,9 +80,9 @@ end
 ---@private
 ---@return table
 function BackDrops:_create_opts()
-   -- If no images are loaded, return focus mode style background
-   if #self.images == 0 then
-      wezterm.log_warn('BackDrops: No images loaded, using focus mode background')
+   -- If no images are loaded or current index is invalid, return focus mode style background
+   if #self.images == 0 or not self.images[self.current_idx] then
+      wezterm.log_warn('BackDrops: No images available, using focus mode background')
       return self:_create_focus_opts()
    end
 
