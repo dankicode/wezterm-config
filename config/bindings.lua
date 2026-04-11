@@ -10,11 +10,13 @@ local function split_with_current_shell(direction)
       local current_process = pane:get_foreground_process_name() or ''
       local cmd = nil
 
-      -- Check if running PowerShell
-      if current_process:lower():find('powershell') or current_process:lower():find('pwsh') then
+      local proc = current_process:lower()
+      -- Check pwsh first since 'pwsh' wouldn't match 'powershell'
+      if proc:find('pwsh') then
+         cmd = { 'pwsh.exe', '-NoLogo' }
+      elseif proc:find('powershell') then
          cmd = { 'powershell.exe', '-NoLogo' }
-      -- Check if running cmd
-      elseif current_process:lower():find('cmd') then
+      elseif proc:find('cmd') then
          cmd = { 'cmd.exe' }
       end
       -- Otherwise, use default (WSL)
