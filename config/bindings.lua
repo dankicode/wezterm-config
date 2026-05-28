@@ -81,6 +81,9 @@ local keys = {
    { key = 'c',          mods = 'CTRL|SHIFT',  action = act.CopyTo('Clipboard') },
    { key = 'v',          mods = 'CTRL|SHIFT',  action = act.PasteFrom('Clipboard') },
 
+   -- Shift+Enter: send CSI u sequence so CLI apps (e.g. Claude Code) can distinguish it from Enter
+   { key = 'Enter',      mods = 'SHIFT',       action = act.SendString('\x1b[13;2u') },
+
    -- tabs --
    -- tabs: spawn+close
    { key = 't',          mods = mod.SUPER,     action = act.SpawnTab('DefaultDomain') },
@@ -245,6 +248,36 @@ local keys = {
       }),
    },
 }
+
+-- Windows-only: paste a clipboard image into CLI apps that accept image paths
+-- (e.g. Claude Code) by saving the clipboard bitmap to a temp PNG and sending
+-- its path. Why this exists and why Ctrl+Alt+V specifically:
+--   * Claude Code's Ctrl+V clipboard-image paste regressed on Windows. Text
+--     paste is unaffected -- it goes through Ctrl+Shift+V above.
+--   * Alt+V can't be used: GlazeWM binds it (toggle-tiling-direction), so it
+--     never reaches the terminal.
+-- macOS reads clipboard images via Ctrl+V natively, so this stays Windows-only.
+if platform.is_win then
+   table.insert(keys, {
+      key = 'v',
+      mods = 'CTRL|ALT',
+      action = wezterm.action_callback(function(_window, pane)
+         local ok, stdout = wezterm.run_child_process({
+            'powershell.exe',
+            '-NoProfile',
+            '-STA',
+            '-Command',
+            [[Add-Type -AssemblyName System.Drawing; $img = Get-Clipboard -Format Image; if ($img) { $p = Join-Path $env:TEMP ('wezterm-paste-' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff') + '.png'); $img.Save($p, [System.Drawing.Imaging.ImageFormat]::Png); [Console]::Out.Write($p) }]],
+         })
+         if ok then
+            local path = (stdout or ''):gsub('%s+$', '')
+            if path ~= '' then
+               pane:send_text(path .. ' ')
+            end
+         end
+      end),
+   })
+end
 
 -- stylua: ignore
 local key_tables = {

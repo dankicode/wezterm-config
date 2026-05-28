@@ -9,10 +9,10 @@ local options = {
 if platform.is_win then
    options.default_prog = { 'pwsh.exe', '-NoLogo' }
    options.launch_menu = {
-      { label = 'PowerShell Core',   args = { 'pwsh.exe', '-NoLogo' } },
+      { label = 'PowerShell Core',    args = { 'pwsh.exe', '-NoLogo' } },
+      { label = 'WSL (Ubuntu)',      args = { 'wsl.exe', '-d', 'Ubuntu' } },
       { label = 'Windows PowerShell', args = { 'powershell.exe', '-NoLogo' } },
       { label = 'Command Prompt',    args = { 'cmd' } },
-      { label = 'WSL (Ubuntu)',      args = { 'wsl.exe', '~' } },
    }
 elseif platform.is_mac then
    options.default_prog = { 'zsh', '-l' }

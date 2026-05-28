@@ -25,7 +25,7 @@ return {
          distribution = 'Ubuntu',
          username = 'dki',
          default_cwd = '/home/dki',
-         default_prog = { 'fish', '-l' },
+         default_prog = { 'zsh', '-l' },
       },
    },
 }
