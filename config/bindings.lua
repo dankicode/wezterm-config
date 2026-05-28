@@ -267,12 +267,14 @@ if platform.is_win then
             '-NoProfile',
             '-STA',
             '-Command',
-            [[Add-Type -AssemblyName System.Drawing; $img = Get-Clipboard -Format Image; if ($img) { $p = Join-Path $env:TEMP ('wezterm-paste-' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff') + '.png'); $img.Save($p, [System.Drawing.Imaging.ImageFormat]::Png); [Console]::Out.Write($p) }]],
+            [[Add-Type -AssemblyName System.Drawing; Get-ChildItem $env:TEMP -Filter 'wezterm-paste-*.png' -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-1) } | Remove-Item -Force -ErrorAction SilentlyContinue; $img = Get-Clipboard -Format Image; if ($img) { $p = Join-Path $env:TEMP ('wezterm-paste-' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff') + '.png'); $img.Save($p, [System.Drawing.Imaging.ImageFormat]::Png); [Console]::Out.Write($p) }]],
          })
          if ok then
             local path = (stdout or ''):gsub('%s+$', '')
             if path ~= '' then
-               pane:send_text(path .. ' ')
+               -- Wrap in bracketed-paste markers so Claude Code treats it as a
+               -- paste (which triggers its image-path attach), not typed text.
+               pane:send_text('\x1b[200~' .. path .. '\x1b[201~')
             end
          end
       end),
